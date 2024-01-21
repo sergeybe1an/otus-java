@@ -1,10 +1,11 @@
 package ru.otus;
 
+import java.util.Deque;
 import java.util.LinkedList;
 
 public class CustomerReverseOrder {
 
-    LinkedList<Customer> customers = new LinkedList<>();
+    private final Deque<Customer> customers = new LinkedList<>();
 
     public void add(Customer customer) {
         customers.push(customer);
