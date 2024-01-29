@@ -32,8 +32,11 @@ public class TestProcessing {
         testMethods.forEach(testMethod -> {
             Object currentObj = instantiate(clazz);
 
-            beforeMethods.forEach(beforeMethod -> invokeMethod(currentObj, beforeMethod));
-            if (invokeMethod(currentObj, testMethod) == SUCCESS) {
+            boolean beforeMethodsResult = beforeMethods.stream()
+                .map(beforeMethod -> invokeMethod(currentObj, beforeMethod))
+                .anyMatch(status -> status == ERROR);
+
+            if (!beforeMethodsResult && invokeMethod(currentObj, testMethod) == SUCCESS) {
                 logger.info(testMethod.getName() + " successfully passed!");
             } else {
                 failedMethods.add(testMethod);
