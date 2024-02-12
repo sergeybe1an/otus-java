@@ -8,27 +8,57 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.otus.SomeTestService;
-import ru.otus.SomeTestServiceImpl;
 import ru.otus.annotations.Log;
 
+/**
+ * Ioc-container
+ */
 public class Ioc {
     private static final Logger logger = LoggerFactory.getLogger(Ioc.class);
 
     private Ioc() {}
 
-    public static SomeTestService createClass() {
-        InvocationHandler handler = new ProxyDemo(new SomeTestServiceImpl());
-        return (SomeTestService)
-                Proxy.newProxyInstance(Ioc.class.getClassLoader(), new Class<?>[] {SomeTestService.class}, handler);
+    @SuppressWarnings("unchecked")
+    public static <T> T createClass(Class<?> clazz, Object... args) {
+        InvocationHandler handler = new ProxyDemo<>(instantiate(clazz, args));
+
+        return (T) Proxy.newProxyInstance(
+            Ioc.class.getClassLoader(),
+            clazz.getInterfaces(),
+            handler
+        );
     }
 
-    static class ProxyDemo implements InvocationHandler {
+    /**
+     * Create object with reflection
+     * @param type created data type class
+     * @param args constructor args
+     * @param <T> created data type
+     * @return new object with T data type
+     */
+    private static <T> T instantiate(Class<T> type, Object... args) {
+        try {
+            if (args.length == 0) {
+                return type.getDeclaredConstructor().newInstance();
+            } else {
+                Class<?>[] classes = toClasses(args);
+                return type.getDeclaredConstructor(classes).newInstance(args);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+     }
 
-        private final SomeTestService service;
+     private static Class<?>[] toClasses(Object[] args) {
+        return Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new);
+     }
+
+    static class ProxyDemo<T> implements InvocationHandler {
+
+        private final T service;
         private final Set<String> annotatedMethods;
 
-        ProxyDemo(SomeTestService service) {
+        ProxyDemo(T service) {
             this.service = service;
             this.annotatedMethods = Arrays.stream(service.getClass().getMethods())
                 .filter(method -> method.isAnnotationPresent(Log.class))
