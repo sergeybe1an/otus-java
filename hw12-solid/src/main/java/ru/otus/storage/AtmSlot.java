@@ -1,7 +1,8 @@
-package ru.otus;
+package ru.otus.storage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.otus.Denominations;
 
 /**
  * Банковская ячейка
@@ -10,7 +11,7 @@ public class AtmSlot {
     private static final Logger logger = LoggerFactory.getLogger(AtmSlot.class.getName());
     private final int ZERO = 0;
     private final Denominations denomination;
-    private int banknotesQuantity;
+    private long banknotesQuantity;
 
     public AtmSlot(Denominations denomination) {
         this.denomination = denomination;
@@ -20,7 +21,7 @@ public class AtmSlot {
      * Внесение банкнот
      * @param banknotesQuantity количество банкнот
      */
-    public void contributeBanknotes(int banknotesQuantity) {
+    public void contributeBanknotes(long banknotesQuantity) {
         if (banknotesQuantity < ZERO) {
             throw new IllegalArgumentException("Количество банкнот не может быть меньше 0!");
         } else {
@@ -34,13 +35,14 @@ public class AtmSlot {
      * Получение банкнот
      * @param banknotesQuantity количество банкнот
      */
-    public void receiveBanknotes(int banknotesQuantity) {
+    public long receiveBanknotes(long banknotesQuantity) {
         if (this.banknotesQuantity < banknotesQuantity) {
             throw new IllegalArgumentException("Вы запрашиваете слишком большое количество банкнот!");
         } else {
             this.banknotesQuantity -= banknotesQuantity;
             logger.info("Выдано {} банкнот номиналом {}, осталось {}",
                 banknotesQuantity, denomination.getValue(), this.banknotesQuantity);
+            return banknotesQuantity;
         }
     }
 
@@ -48,7 +50,7 @@ public class AtmSlot {
         return denomination;
     }
 
-    public int getBanknotesQuantity() {
+    public long getBanknotesQuantity() {
         return banknotesQuantity;
     }
 }

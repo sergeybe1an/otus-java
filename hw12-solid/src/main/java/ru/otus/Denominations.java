@@ -16,7 +16,7 @@ public enum Denominations {
         this.value = value;
     }
 
-    int getValue() {
+    public int getValue() {
         return value;
     }
 }

@@ -10,6 +10,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.otus.storage.AtmSlot;
+import ru.otus.storage.AtmStorage;
+import ru.otus.storage.Storage;
 
 public class AtmTest {
 
@@ -19,7 +22,8 @@ public class AtmTest {
     @DisplayName("Тест внесения банкнот в терминал")
     @Test
     void contributeBanknotesTest() {
-        Atm atm = new Atm(denominationsSet);
+        Storage<Denominations, AtmSlot> storage = new AtmStorage(denominationsSet);
+        Atm atm = new AtmImpl(storage);
 
         Map<Denominations, Integer> banknotesMap = new TreeMap<>() {{
             put(Denominations.ONE_HUNDRED, 3);
@@ -33,7 +37,8 @@ public class AtmTest {
     @DisplayName("Тест внесения неподдерживаемой банкноты терминалом")
     @Test
     void contributeWrongBanknotesTest() {
-        Atm atm = new Atm(denominationsSet);
+        Storage<Denominations, AtmSlot> storage = new AtmStorage(denominationsSet);
+        Atm atm = new AtmImpl(storage);
 
         Map<Denominations, Integer> banknotesMap = new TreeMap<>() {{
             put(Denominations.FIVE_HUNDRED, 3);
@@ -46,7 +51,8 @@ public class AtmTest {
     @DisplayName("Тест снятия банкнот с терминала")
     @Test
     void receiveBanknotesTest() {
-        Atm atm = new Atm(denominationsSet);
+        Storage<Denominations, AtmSlot> storage = new AtmStorage(denominationsSet);
+        Atm atm = new AtmImpl(storage);
 
         Map<Denominations, Integer> banknotesMap = new TreeMap<>() {{
             put(Denominations.ONE_HUNDRED, 3);
@@ -62,7 +68,8 @@ public class AtmTest {
     @DisplayName("Тест снятия с терминала отрицательной суммы")
     @Test
     void receiveBanknotesNegativeSumTest() {
-        Atm atm = new Atm(denominationsSet);
+        Storage<Denominations, AtmSlot> storage = new AtmStorage(denominationsSet);
+        Atm atm = new AtmImpl(storage);
 
         Map<Denominations, Integer> banknotesMap = new TreeMap<>() {{
             put(Denominations.ONE_HUNDRED, 3);
@@ -76,7 +83,8 @@ public class AtmTest {
     @DisplayName("Тест снятия с терминала неправильной суммы")
     @Test
     void receiveBanknotesWrongSumTest() {
-        Atm atm = new Atm(denominationsSet);
+        Storage<Denominations, AtmSlot> storage = new AtmStorage(denominationsSet);
+        Atm atm = new AtmImpl(storage);
 
         Map<Denominations, Integer> banknotesMap = new TreeMap<>() {{
             put(Denominations.ONE_HUNDRED, 3);
@@ -90,7 +98,8 @@ public class AtmTest {
     @DisplayName("Тест снятия банкнот с терминала, длинный сценарий")
     @Test
     void receiveBanknotesLongScenario1_Test() {
-        Atm atm = new Atm(denominationsSet);
+        Storage<Denominations, AtmSlot> storage = new AtmStorage(denominationsSet);
+        Atm atm = new AtmImpl(storage);
 
         //добавляем 3*100 и 2*1000
         Map<Denominations, Integer> banknotesMap1 = new TreeMap<>() {{
