@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import ru.otus.listener.Listener;
 import ru.otus.model.Message;
 import ru.otus.processor.Processor;
-import ru.otus.processor.ProcessorExceptionByTime;
 
 class ComplexProcessorTest {
 

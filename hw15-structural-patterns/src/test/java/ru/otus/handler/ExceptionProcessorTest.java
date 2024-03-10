@@ -12,6 +12,7 @@ import ru.otus.model.Message;
 import ru.otus.processor.ProcessorExceptionByTime;
 
 public class ExceptionProcessorTest {
+
     @Test
     @DisplayName("Тестируем процессор с четной секундой")
     void evenSecondTest() {
