@@ -1,5 +1,6 @@
 package ru.otus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,10 @@ public class HomeWork {
     private static final Logger logger = LoggerFactory.getLogger(HomeWork.class);
 
     public static void main(String[] args) {
-        var processors = List.of(new ProcessorChangeFields(), new ProcessorExceptionByTime());
+        var processors = List.of(
+            new ProcessorChangeFields(),
+            new ProcessorExceptionByTime(LocalDateTime::now)
+        );
 
         var complexProcessor = new ComplexProcessor(processors, ex -> {});
         var listenerHistory = new HistoryListener();

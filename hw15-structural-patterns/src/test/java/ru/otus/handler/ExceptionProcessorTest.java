@@ -1,14 +1,16 @@
 package ru.otus.handler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.otus.listener.Listener;
 import ru.otus.model.Message;
+import ru.otus.processor.DateTimeProvider;
 import ru.otus.processor.ProcessorExceptionByTime;
 
 public class ExceptionProcessorTest {
@@ -16,21 +18,29 @@ public class ExceptionProcessorTest {
     @Test
     @DisplayName("Тестируем процессор с четной секундой")
     void evenSecondTest() {
-        // given
+        var dateTimeProvider = mock(DateTimeProvider.class);
         var message = new Message.Builder(1L).build();
+        var processor = new ProcessorExceptionByTime(dateTimeProvider);
 
-        var listener = mock(Listener.class);
+        when(dateTimeProvider.getDateTime())
+            .thenReturn(LocalDateTime.ofEpochSecond(2, 0, ZoneOffset.UTC));
 
-        var complexProcessor = new ComplexProcessor(List.of(new ProcessorExceptionByTime()), (ex) -> {});
+        assertThatExceptionOfType(RuntimeException.class)
+            .isThrownBy(() -> processor.process(message));
+    }
 
-        complexProcessor.addListener(listener);
+    @Test
+    @DisplayName("Тестируем процессор с нечетной секундой")
+    void oddSecondTest() {
+        var dateTimeProvider = mock(DateTimeProvider.class);
+        var message = new Message.Builder(1L).build();
+        var processor = new ProcessorExceptionByTime(dateTimeProvider);
 
-        // when
-        complexProcessor.handle(message);
-        complexProcessor.removeListener(listener);
-        complexProcessor.handle(message);
+        when(dateTimeProvider.getDateTime())
+            .thenReturn(LocalDateTime.ofEpochSecond(3, 0, ZoneOffset.UTC));
 
-        // then
-        verify(listener, times(1)).onUpdated(message);
+        var result = processor.process(message);
+
+        assertThat(result).isEqualTo(message);
     }
 }
