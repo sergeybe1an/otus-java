@@ -10,9 +10,11 @@ import ru.otus.jdbc.annotation.Id;
 public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
 
     private Class<T> clazz;
+    private Field[] declaredFields;
 
     public EntityClassMetaDataImpl(Class<T> clazz) {
         this.clazz = clazz;
+        this.declaredFields = clazz.getDeclaredFields();
     }
 
     @Override
@@ -31,7 +33,7 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
 
     @Override
     public Field getIdField() {
-        return Arrays.stream(clazz.getDeclaredFields())
+        return Arrays.stream(declaredFields)
             .filter(field -> field.isAnnotationPresent(Id.class))
             .findFirst()
             .orElseThrow(() -> {
@@ -41,12 +43,12 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
 
     @Override
     public List<Field> getAllFields() {
-        return Arrays.asList(clazz.getDeclaredFields());
+        return Arrays.asList(declaredFields);
     }
 
     @Override
     public List<Field> getFieldsWithoutId() {
-        return Arrays.stream(clazz.getDeclaredFields())
+        return Arrays.stream(declaredFields)
             .filter(field -> !field.isAnnotationPresent(Id.class))
             .collect(Collectors.toList());
     }

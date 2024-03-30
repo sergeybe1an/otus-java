@@ -119,6 +119,10 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
             });
     }
 
+    /**
+     * Inject EntityClassMetaData<T> into DataTemplateJdbc
+     * @return EntityClassMetaData<T>
+     */
     private EntityClassMetaData<T> initMetadata() {
         if (entityClassMetaData != null) {
             return entityClassMetaData;
@@ -148,15 +152,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
             try {
                 Field objField = object.getClass().getDeclaredField(fieldName);
                 objField.setAccessible(true);
-                Class<?> fieldType = field.getType();
-
-                if (fieldType.equals(Long.class)) {
-                    value = rs.getLong(fieldName);
-                } else if (fieldType.equals(String.class)) {
-                    value = rs.getString(fieldName);
-                } else {
-                    throw new RuntimeException("Неизвестный тип данных у поля!");
-                }
+                value = rs.getObject(fieldName);
                 objField.set(object, value);
             } catch (Exception e) {
                 throw new RuntimeException(e);
