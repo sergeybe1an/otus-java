@@ -14,12 +14,12 @@ public class DbServiceClientImpl implements DBServiceClient {
 
     private final DataTemplate<Client> clientDataTemplate;
     private final TransactionManager transactionManager;
-    private final HwCache<Long, Client> cache;
+    private final HwCache<String, Client> cache;
 
     public DbServiceClientImpl(
         TransactionManager transactionManager,
         DataTemplate<Client> clientDataTemplate,
-        HwCache<Long, Client> cache
+        HwCache<String, Client> cache
     ) {
         this.transactionManager = transactionManager;
         this.clientDataTemplate = clientDataTemplate;
@@ -37,18 +37,22 @@ public class DbServiceClientImpl implements DBServiceClient {
             }
             var savedClient = clientDataTemplate.update(session, clientCloned);
             log.info("updated client: {}", savedClient);
+            cache.put(savedClient.getId().toString(), savedClient);
             return savedClient;
         });
     }
 
     @Override
     public Optional<Client> getClient(long id) {
-        if (cache.get(id) != null) return Optional.of(cache.get(id));
+        var idAsStr = String.valueOf(id);
+        if (cache.get(idAsStr) != null) {
+            return Optional.of(cache.get(idAsStr));
+        }
 
         return transactionManager.doInReadOnlyTransaction(session -> {
             var clientOptional = clientDataTemplate.findById(session, id);
             log.info("client: {}", clientOptional);
-            clientOptional.ifPresent(client -> cache.put(id, client));
+            clientOptional.ifPresent(client -> cache.put(idAsStr, client));
             return clientOptional;
         });
     }

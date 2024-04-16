@@ -4,9 +4,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MyCache<K, V> implements HwCache<K, V> {
 
+    private static Logger logger = LoggerFactory.getLogger(MyCache.class.getName());
     private final Map<K, V> weakMap = new WeakHashMap<>();
     private final Set<HwListener<K, V>> listeners = new HashSet<>();
 
@@ -40,6 +43,12 @@ public class MyCache<K, V> implements HwCache<K, V> {
     }
 
     private void executeListeners(K key, V value, String action) {
-        listeners.forEach(listener -> listener.notify(key, value, action));
+        listeners.forEach(listener -> {
+            try {
+                listener.notify(key, value, action);
+            } catch (Throwable e) {
+                logger.error("Error while executing listener with action {} for key {}: {}", action, key, e.getMessage());
+            }
+        });
     }
 }
